@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if [[ $# == 0 ]]
+then
+  BR_BASE="develop"
+elif [[ $# == 1 ]]
+then
+  BR_BASE="$1"
+else
+  echo "usage: $(basename $0) YOUR_BASE_BRANCH"
+  exit 1
+fi
+
+CURRENT=$(git rev-parse --abbrev-ref HEAD)
+
+STATUS=$(git branch -vv)
+
+# push를 해봅시다
+# tracking이 되는지 확인
+if [[ $STATUS == *origin/$CURRENT* ]]
+then
+  # 이미 push가 되었는지 확인
+  if [ $(git rev-parse $CURRENT) != $(git rev-parse origin/$CURRENT) ]
+  then
+    git push origin $CURRENT
+  fi
+else
+  git push -u origin $CURRENT
+fi
+
+if [ $? -ne 0 ]
+then
+  echo "Push failed"
+  exit 1
+fi
+
+# Compare url 만들고 브라우저로 열기
+
+GITHUB_ID=$(git config --get remote.origin.url | sed -e 's/^[^:]*://' | sed -e 's/.git$//' | sed -e 's/^[^:]*github.com\///')
+BODY="## Changes\n"
+
+TICKET=$(echo "$CURRENT" | grep -Eo "(DATACENTER|RESEARCH|EDITOR)-[0-9]+")
+
+if [[ $TICKET == "" ]]
+then
+  BODY+="- "
+else
+  BODY+="- Jira Ticket: [$TICKET]\n-"
+fi
+
+BODY_QUERY+=$(echo "$BODY" | perl -MURI::Escape -ne 'chomp;$str = uri_escape($_); $str =~ s/%5Cn/%0A/ig; print $str')
+URL="https://github.com/$GITHUB_ID/compare/$BR_BASE...$CURRENT?expand=1&body=$BODY_QUERY"
+
+case $(uname -s) in
+"Darwin")
+  open $URL
+;;
+"Linux")
+  xdg-open $URL
+;;
+*)
+  echo "Access link to compare and create pull request"
+  echo $URL
+;;
+esac

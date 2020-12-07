@@ -1,0 +1,28 @@
+#!/bin/bash
+
+BR_BASE="master"
+DATE=$(date +%y%m%d)
+
+if [[ $# == 1 ]]
+then
+  BRANCH_NAME="${DATE}_$1"
+elif [[ $# == 2 ]]
+then
+  TICKET="$1"
+  # default: DATACENTER
+  echo "$TICKET" | grep -Eq "^(DATACENTER|RESEARCH|EDITOR)-[0-9]+" || TICKET="DATACENTER-$TICKET"
+
+  BRANCH_NAME="${DATE}_${TICKET}_$2"
+else
+  base=$(basename $0)
+  echo "usage: $base HOTFIX_NAME"
+  echo "usage: $base JIRA_TICKET_NUMBER HOTFIX_NAME"
+  exit 1
+fi
+
+if [ $(git rev-parse --abbrev-ref HEAD) != "$BR_BASE" ]
+then
+  git checkout $BR_BASE
+fi
+
+git checkout -b $BRANCH_NAME
