@@ -51,15 +51,13 @@ fi
 BODY_QUERY+=$(python -c "import sys, urllib.parse; print(urllib.parse.quote_plus(\"$BODY\"))")
 URL="https://github.com/$GITHUB_ID/compare/$BR_BASE...$CURRENT?expand=1&body=$BODY_QUERY"
 
-case $(uname -s) in
-"Darwin")
-  open $URL
-;;
-"Linux")
-  xdg-open $URL
-;;
-*)
+if [[ $(uname -s) == "Darwin" ]]
+then
+  open "$URL"
+elif which xdg-open > /dev/null
+then
+  xdg-open "$URL"
+else
   echo "Access link to compare and create pull request"
-  echo $URL
-;;
-esac
+  echo "$URL"
+fi
