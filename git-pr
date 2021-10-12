@@ -48,7 +48,7 @@ else
   BODY+="- Jira Ticket: [$TICKET]\n-"
 fi
 
-BODY_QUERY+=$(python -c "import sys, urllib.parse; print(urllib.parse.quote_plus(\"$BODY\"))")
+BODY_QUERY+=$(python3 -c "import sys, urllib.parse; print(urllib.parse.quote_plus(\"$BODY\"))")
 URL="https://github.com/$GITHUB_ID/compare/$BR_BASE...$CURRENT?expand=1&body=$BODY_QUERY"
 
 if [[ $(uname -s) == "Darwin" ]]
