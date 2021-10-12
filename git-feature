@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BR_BASE="develop"
+BR_BASE=${BR_BASE:-"develop"}
 DATE=$(date +%y%m%d)
 
 if [[ $# == 1 ]]
