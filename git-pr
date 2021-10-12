@@ -2,7 +2,7 @@
 
 if [[ $# == 0 ]]
 then
-  BR_BASE="develop"
+  BR_BASE=${BR_BASE:-"develop"}
 elif [[ $# == 1 ]]
 then
   BR_BASE="$1"
