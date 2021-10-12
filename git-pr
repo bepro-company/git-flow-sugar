@@ -48,7 +48,7 @@ else
   BODY+="- Jira Ticket: [$TICKET]\n-"
 fi
 
-BODY_QUERY+=$(echo "$BODY" | perl -MURI::Escape -ne 'chomp;$str = uri_escape($_); $str =~ s/%5Cn/%0A/ig; print $str')
+BODY_QUERY+=$(python -c "import sys, urllib.parse; print(urllib.parse.quote_plus(\"$BODY\"))")
 URL="https://github.com/$GITHUB_ID/compare/$BR_BASE...$CURRENT?expand=1&body=$BODY_QUERY"
 
 case $(uname -s) in
